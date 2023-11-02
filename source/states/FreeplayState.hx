@@ -20,12 +20,17 @@ import sys.FileSystem;
 class FreeplayState extends MusicBeatState
 {
 	var songs:Array<SongMetadata> = [];
+	var weekName:String = '';
 
 	var selector:FlxText;
 	private static var curSelected:Int = 0;
 	var lerpSelected:Float = 0;
 	var curDifficulty:Int = -1;
 	private static var lastDifficultyName:String = Difficulty.getDefault();
+
+	public static var leText:String;
+
+	public static var sizeJust:Int;
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
@@ -49,8 +54,12 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
+
 		//Paths.clearStoredMemory();
 		//Paths.clearUnusedMemory();
+
+		FlxG.sound.playMusic(Paths.music('StateHorror2'), 0);
+		FlxG.sound.music.fadeIn(2, 0, 0.9);
 		
 		persistentUpdate = true;
 		PlayState.isStoryMode = false;
@@ -62,11 +71,14 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		for (i in 0...WeekData.weeksList.length) {
+			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			if(weekIsLocked(WeekData.weeksList[i])) continue;
 
-			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			var leSongs:Array<String> = [];
 			var leChars:Array<String> = [];
+			var leNameWeek:Array<String> = [];
+
+			weekName = leWeek.weekName;
 
 			for (j in 0...leWeek.songs.length)
 			{
@@ -87,7 +99,7 @@ class FreeplayState extends MusicBeatState
 		}
 		Mods.loadTopMod();
 
-		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		bg = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
 		bg.screenCenter();
@@ -99,10 +111,12 @@ class FreeplayState extends MusicBeatState
 		{
 			var songText:Alphabet = new Alphabet(90, 320, songs[i].songName, true);
 			songText.targetY = i;
+			//FlxTween.tween(songText, {x: 90}, 3);
 			grpSongs.add(songText);
 
 			songText.scaleX = Math.min(1, 980 / songText.width);
 			songText.snapToPosition();
+			songText.screenCenter();
 
 			Mods.currentModDirectory = songs[i].folder;
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
@@ -115,11 +129,11 @@ class FreeplayState extends MusicBeatState
 
 			// using a FlxGroup is too much fuss!
 			iconArray.push(icon);
-			add(icon);
+			//add(icon);
 
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-			// songText.screenCenter(X);
+			 songText.screenCenter(X);
 		}
 		WeekData.setDirectoryFromWeek();
 
@@ -162,29 +176,49 @@ class FreeplayState extends MusicBeatState
 		textBG.alpha = 0.6;
 		add(textBG);
 
+		if (ClientPrefs.data.language == 'Inglish') {
 		#if PRELOAD_ALL
-		#if android
-		var leText:String = "Press X to listen to the Song / Press C to open the Gameplay Changers Menu / Press Y to Reset your Score and Accuracy.";
-		var size:Int = 16;
+		leText = "Press SPACE to listen to the Song / Press RESET to Reset your Score and Accuracy.";
+		sizeJust = 16;
 		#else
-		var leText:String = "Press SPACE to listen to the Song / Press CTRL to open the Gameplay Changers Menu / Press RESET to Reset your Score and Accuracy.";
-		var size:Int = 16;
+		leText = "Press CTRL to open the Gameplay Changers Menu / Press RESET to Reset your Score and Accuracy.";
+		size = 18;
 		#end
-		#else
-		var leText:String = "Press C to open the Gameplay Changers Menu / Press Y to Reset your Score and Accuracy.";
-		var size:Int = 18;
-		#end
-		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, size);
-		text.setFormat(Paths.font("vcr.ttf"), size, FlxColor.WHITE, RIGHT);
+		}
+		if (ClientPrefs.data.language == 'Spanish') {
+			#if PRELOAD_ALL
+			leText = "Presione ESPACIO para escuchar la canción / Presione RESET para restablecer su puntuación y precisión.";
+			sizeJust = 16;
+			#else
+			leText = "Presione CTRL para abrir el menú de cambios de juego / Presione RESET para restablecer su puntuación y precisión.";
+			size = 18;
+			#end
+		}
+		if (ClientPrefs.data.language == 'Mandarin') {
+			#if PRELOAD_ALL
+			leText = "按 SPACE 聆听歌曲/按 RESET 重置您的分数和准确性。";
+			sizeJust = 16;
+			#else
+			leText = "按 CTRL 键打开游戏更改​​菜单/按 RESET 重置您的分数和准确度。";
+			size = 18;
+			#end
+		}
+		if (ClientPrefs.data.language == 'Portuguese') {
+			#if PRELOAD_ALL
+			leText = "Pressione ESPAÇO para ouvir a música / Pressione RESET para redefinir sua pontuação e precisão.";
+			sizeJust = 16;
+			#else
+			leText = "Pressione CTRL para abrir o menu Gameplay Changers / Pressione RESET para redefinir sua pontuação e precisão.";
+			size = 18;
+			#end
+		}
+
+		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, sizeJust);
+		text.setFormat(Paths.font("vcr.ttf"), sizeJust, FlxColor.WHITE, RIGHT);
 		text.scrollFactor.set();
 		add(text);
 		
 		updateTexts();
-		
-		#if android
-                addVirtualPad(FULL, A_B_C_X_Y_Z);
-                #end
-                
 		super.create();
 	}
 
@@ -246,11 +280,22 @@ class FreeplayState extends MusicBeatState
 			ratingSplit[1] += '0';
 		}
 
+		if (ClientPrefs.data.language == 'Inglish') {
 		scoreText.text = 'PERSONAL BEST: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		}
+		if (ClientPrefs.data.language == 'Spanish') {
+			scoreText.text = 'MEJOR MARCA PERSONAL: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		}
+		if (ClientPrefs.data.language == 'Portuguese') {
+			scoreText.text = 'MELHOR PESSOAL: ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		}
+		if (ClientPrefs.data.language == 'Mandarin') {
+			scoreText.text = '个人最佳得分： ' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		}
 		positionHighscore();
 
 		var shiftMult:Int = 1;
-		if(FlxG.keys.pressed.SHIFT  #if android || MusicBeatState._virtualpad.buttonZ.pressed #end) shiftMult = 3;
+		if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
 
 		if(songs.length > 1)
 		{
@@ -312,21 +357,18 @@ class FreeplayState extends MusicBeatState
 				colorTween.cancel();
 			}
 			FlxG.sound.play(Paths.sound('cancelMenu'));
+			FlxG.sound.playMusic(Paths.music(ClientPrefs.data.musicstate), 0);
+			FlxG.sound.music.fadeOut(2, 0);
 			MusicBeatState.switchState(new MainMenuState());
 		}
-
-		if(FlxG.keys.justPressed.CONTROL #if android || MusicBeatState._virtualpad.buttonC.justPressed #end)
-		{
-			persistentUpdate = false;
-			openSubState(new GameplayChangersSubstate());
-		}
-		else if(FlxG.keys.justPressed.SPACE #if android || MusicBeatState._virtualpad.buttonX.justPressed #end)
+		else if(FlxG.keys.justPressed.SPACE)
 		{
 			if(instPlaying != curSelected)
 			{
 				#if PRELOAD_ALL
 				destroyFreeplayVocals();
-				FlxG.sound.music.volume = 0;
+				//FlxG.sound.playMusic(Paths.music('StateHorror2'), 0); //Error de confucion de Sonidos
+				FlxG.sound.music.fadeOut(2, 0);
 				Mods.currentModDirectory = songs[curSelected].folder;
 				var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
 				PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
@@ -349,6 +391,7 @@ class FreeplayState extends MusicBeatState
 		else if (controls.ACCEPT)
 		{
 			persistentUpdate = false;
+			FlxG.sound.music.fadeOut(2, 0);
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			/*#if MODS_ALLOWED
@@ -376,10 +419,21 @@ class FreeplayState extends MusicBeatState
 			catch(e:Dynamic)
 			{
 				trace('ERROR! $e');
-                var errorStr:String = Mods.currentModDirectory + '/data/' + songLowercase + '/' + poop + '.json';
-				//var errorStr:String = e.toString();
-				/*if(errorStr.startsWith('[file_contents,assets/data/')) errorStr = 'Missing file: ' + errorStr.substring(27, errorStr.length-1); //Missing chart*/
+
+				var errorStr:String = e.toString();
+				if(errorStr.startsWith('[file_contents,assets/data/')) errorStr = 'Missing file: ' + errorStr.substring(27, errorStr.length-1); //Missing chart
+				if (ClientPrefs.data.language == 'Inglish') {
 				missingText.text = 'ERROR WHILE LOADING CHART:\n$errorStr';
+				}
+				if (ClientPrefs.data.language == 'Spanish') {
+					missingText.text = 'ERROR AL CARGAR EL CHART:\n$errorStr';
+				}
+				if (ClientPrefs.data.language == 'Portuguese') {
+					missingText.text = 'ERRO AO CARREGAR TABELA:\n$errorStr';
+				}
+				if (ClientPrefs.data.language == 'Mandarin') {
+					missingText.text = '加载图表时出错：\n$errorStr';
+				}
 				missingText.screenCenter(Y);
 				missingText.visible = true;
 				missingTextBG.visible = true;
@@ -389,26 +443,17 @@ class FreeplayState extends MusicBeatState
 				super.update(elapsed);
 				return;
 			}
-			
-			if (FlxG.keys.pressed.SHIFT #if android || MusicBeatState._virtualpad.buttonZ.pressed #end){
-				LoadingState.loadAndSwitchState(new ChartingState());
-			}else{
-				LoadingState.loadAndSwitchState(new PlayState());
-			}
-			//LoadingState.loadAndSwitchState(new PlayState());
+			LoadingState.loadAndSwitchState(new PlayState());
 
 			FlxG.sound.music.volume = 0;
 					
 			destroyFreeplayVocals();
-			#if desktop
+			#if MODS_ALLOWED
 			DiscordClient.loadModRPC();
 			#end
 		}
-		else if(controls.RESET #if android || MusicBeatState._virtualpad.buttonY.justPressed #end)
+		else if(controls.RESET)
 		{
-		    #if android
-			removeVirtualPad();
-			#end
 			persistentUpdate = false;
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
 			FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -463,7 +508,7 @@ class FreeplayState extends MusicBeatState
 			curSelected = songs.length - 1;
 		if (curSelected >= songs.length)
 			curSelected = 0;
-			
+
 		var newColor:Int = songs[curSelected].color;
 		if(newColor != intendedColor) {
 			if(colorTween != null) {

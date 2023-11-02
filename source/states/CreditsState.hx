@@ -4,12 +4,15 @@ package states;
 import sys.FileSystem;
 import sys.io.File;
 #end
+import substates.Prompt;
 
 import objects.AttachedSprite;
 
 class CreditsState extends MusicBeatState
 {
 	var curSelected:Int = -1;
+
+	public var ignoreWarnings = false;
 
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 	private var iconArray:Array<AttachedSprite> = [];
@@ -42,48 +45,13 @@ class CreditsState extends MusicBeatState
 		#if MODS_ALLOWED
 		for (mod in Mods.parseList().enabled) pushModCreditsToList(mod);
 		#end
-			
-		var beihuLink:String = 'https://b23.tv/LVj0JVk';
-		var yanqiangLink:String = 'https://b23.tv/FBxHIwT';
-		var Xx_angelkawaii_XLink:String = 'https://space.bilibili.com/1991407094';
-		
-		#if android
-		if (DeviceLanguage.getLang() != 'zh') {
-		beihuLink = 'https://youtube.com/@beihu235';
-		Xx_angelkawaii_XLink = 'https://www.youtube.com/@angelkawaii9826';
-		}
-		#end
-								
-		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
-		    ['Psych Engine Android Team'],
-		    ['beihu',		'beihu',		'Main Android Porter\nport owner',							beihuLink,	'FFC0CB'],
-			['yanqiang',     'yanqiang',	    'Android Porter\nBug fix',							yanqiangLink,	'7192FD'],
-			['Xx_angelkawaii_X',     'Xx_angelkawaii_X',	    'Bug fix',							Xx_angelkawaii_XLink,	'FFA2DE'],
-			['pwp',	    'pwp',	    'Update function',	    	    	    	    	  'https://b23.tv/JXzfNIB',	   'FFA500'],
-			[''],
-			['Psych Engine Team'],
-			['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',								'https://twitter.com/Shadow_Mario_',	'444444'],
-			['Riveren',				'riveren',			'Main Artist/Animator of Psych Engine',							'https://twitter.com/riverennn',		'B42F71'],
-			[''],
-			['Former Engine Members'],
-			['shubs',				'shubs',			'Ex-Programmer of Psych Engine',								'https://twitter.com/yoshubs',			'5E99DF'],
-			['bb-panzu',			'bb',				'Ex-Programmer of Psych Engine',								'https://twitter.com/bbsub3',			'3E813A'],
-			[''],
-			['Engine Contributors'],
-			['iFlicky',				'flicky',			'Composer of Psync and Tea Time\nMade the Dialogue Sounds',		'https://twitter.com/flicky_i',			'9E29CF'],
-			['SqirraRNG',			'sqirra',			'Crash Handler and Base code for\nChart Editor\'s Waveform',	'https://twitter.com/gedehari',			'E1843A'],
-			['EliteMasterEric',		'mastereric',		'Runtime Shaders support',										'https://twitter.com/EliteMasterEric',	'FFBD40'],
-			['PolybiusProxy',		'proxy',			'.MP4 Video Loader Library (hxCodec)',							'https://twitter.com/polybiusproxy',	'DCD294'],
-			['KadeDev',				'kade',				'Fixed some cool stuff on Chart Editor\nand other PRs',			'https://twitter.com/kade0912',			'64A250'],
-			['Keoiki',				'keoiki',			'Note Splash Animations and Latin Alphabet',					'https://twitter.com/Keoiki_',			'D2D2D2'],
-			['superpowers04',		'superpowers04',	'LUA JIT Fork',													'https://twitter.com/superpowers04',	'B957ED'],
-			['Smokey',				'smokey',			'Sprite Atlas Support',											'https://twitter.com/Smokey_5_',		'483D92'],
-			[''],
-			["Funkin' Crew"],
-			['ninjamuffin99',		'ninjamuffin99',	"Programmer of Friday Night Funkin'",							'https://twitter.com/ninja_muffin99',	'CF2D2D'],
-			['PhantomArcade',		'phantomarcade',	"Animator of Friday Night Funkin'",								'https://twitter.com/PhantomArcade3K',	'FADC45'],
-			['evilsk8r',			'evilsk8r',			"Artist of Friday Night Funkin'",								'https://twitter.com/evilsk8r',			'5ABD4B'],
-			['kawaisprite',			'kawaisprite',		"Composer of Friday Night Funkin'",								'https://twitter.com/kawaisprite',		'378FC7']
+
+		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color - WebName
+			['Ending Corruption\nCreator - ThonnyDev'],
+			['Canal De Youtube',	'youtube',		'Youtube.com/@ThonnyDev',	'https://www.youtube.com/channel/UCIjku6e7Fsuh9szD5QUDI8A',	'000000', 'Youtube.com'],
+			['GameBanana',			'gamebanana',		'Gamebana.com/wips/EndingCorruption', 'https://gamebanana.com/wips/79622', '000000', 'Gamebanana.com'],
+			['Gamejolt',			'gamejolt',		'Gamejolt.com/games/EndingCorruptionDemo', 'https://gamejolt.com/games/EndingCorruptionDemo/845799', '000000', 'Gamejolt.com'],
+			['Discord',				'discord',		'discord.gg/UPYsecaNQC',					'https://discord.gg/UPYsecaNQC',				'000000',		'discord.gg']
 		];
 		
 		for(i in defaultList) {
@@ -140,9 +108,6 @@ class CreditsState extends MusicBeatState
 		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
 		changeSelection();
-		#if android
-                addVirtualPad(UP_DOWN, A_B_C);
-                #end
 		super.create();
 	}
 
@@ -160,7 +125,7 @@ class CreditsState extends MusicBeatState
 			if(creditsStuff.length > 1)
 			{
 				var shiftMult:Int = 1;
-				if(FlxG.keys.pressed.SHIFT  #if android || MusicBeatState._virtualpad.buttonC.pressed #end) shiftMult = 3;
+				if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
 
 				var upP = controls.UI_UP_P;
 				var downP = controls.UI_DOWN_P;
@@ -190,7 +155,10 @@ class CreditsState extends MusicBeatState
 			}
 
 			if(controls.ACCEPT && (creditsStuff[curSelected][3] == null || creditsStuff[curSelected][3].length > 4)) {
-				CoolUtil.browserLoad(creditsStuff[curSelected][3]);
+				openSubState(new Prompt('Estas por ser Redirigido a \n' + creditsStuff[curSelected][5] + '\n\nEstas Seguro?', 0, function() {
+					CoolUtil.browserLoad(creditsStuff[curSelected][3]);
+				},
+				null, ignoreWarnings));
 			}
 			if (controls.BACK)
 			{

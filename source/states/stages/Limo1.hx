@@ -2,23 +2,13 @@ package states.stages;
 
 import states.stages.objects.*;
 
-enum HenchmenKillState
-{
-	WAIT;
-	KILLING;
-	SPEEDING_OFFSCREEN;
-	SPEEDING;
-	STOPPING;
-}
-
-class Limo extends BaseStage
+class Limo1 extends BaseStage
 {
 	var grpLimoDancers:FlxTypedGroup<BackgroundDancer>;
 	var fastCar:BGSprite;
 	var fastCarCanDrive:Bool = true;
 
 	// event
-	var limoKillingState:HenchmenKillState = WAIT;
 	var limoMetalPole:BGSprite;
 	var limoLight:BGSprite;
 	var limoCorpse:BGSprite;
@@ -116,77 +106,6 @@ class Limo extends BaseStage
 					spr.destroy();
 				}
 			});
-
-			switch(limoKillingState) {
-				case KILLING:
-					limoMetalPole.x += 5000 * elapsed;
-					limoLight.x = limoMetalPole.x - 180;
-					limoCorpse.x = limoLight.x - 50;
-					limoCorpseTwo.x = limoLight.x + 35;
-
-					var dancers:Array<BackgroundDancer> = grpLimoDancers.members;
-					for (i in 0...dancers.length) {
-						if(dancers[i].x < FlxG.width * 1.5 && limoLight.x > (370 * i) + 170) {
-							switch(i) {
-								case 0 | 3:
-									//if(i == 0) FlxG.sound.play(Paths.sound('dancerdeath'), 0.5);
-
-									var diffStr:String = i == 3 ? ' 2 ' : ' ';
-									/*var particle:BGSprite = new BGSprite('gore/noooooo', dancers[i].x + 200, dancers[i].y, 0.4, 0.4, ['hench leg spin' + diffStr + 'PINK'], false);
-									grpLimoParticles.add(particle);
-									var particle:BGSprite = new BGSprite('gore/noooooo', dancers[i].x + 160, dancers[i].y + 200, 0.4, 0.4, ['hench arm spin' + diffStr + 'PINK'], false);
-									grpLimoParticles.add(particle);
-									var particle:BGSprite = new BGSprite('gore/noooooo', dancers[i].x, dancers[i].y + 50, 0.4, 0.4, ['hench head spin' + diffStr + 'PINK'], false);
-									grpLimoParticles.add(particle);
-
-									var particle:BGSprite = new BGSprite('gore/stupidBlood', dancers[i].x - 110, dancers[i].y + 20, 0.4, 0.4, ['blood'], false);
-									particle.flipX = true;
-									particle.angle = -57.5;
-									grpLimoParticles.add(particle);*/
-								case 1:
-									limoCorpse.visible = true;
-								case 2:
-									limoCorpseTwo.visible = true;
-							} //Note: Nobody cares about the fifth dancer because he is mostly hidden offscreen :(
-							dancers[i].x += FlxG.width * 2;
-						}
-					}
-
-					if(limoMetalPole.x > FlxG.width * 2) {
-						resetLimoKill();
-						limoSpeed = 800;
-						limoKillingState = SPEEDING_OFFSCREEN;
-					}
-
-				case SPEEDING_OFFSCREEN:
-					limoSpeed -= 4000 * elapsed;
-					bgLimo.x -= limoSpeed * elapsed;
-					if(bgLimo.x > FlxG.width * 1.5) {
-						limoSpeed = 3000;
-						limoKillingState = SPEEDING;
-					}
-
-				case SPEEDING:
-					limoSpeed -= 2000 * elapsed;
-					if(limoSpeed < 1000) limoSpeed = 1000;
-
-					bgLimo.x -= limoSpeed * elapsed;
-					if(bgLimo.x < -275) {
-						limoKillingState = STOPPING;
-						limoSpeed = 800;
-					}
-					dancersParenting();
-
-				case STOPPING:
-					bgLimo.x = FlxMath.lerp(bgLimo.x, -150, FlxMath.bound(elapsed * 9, 0, 1));
-					if(Math.round(bgLimo.x) == -150) {
-						bgLimo.x = -150;
-						limoKillingState = WAIT;
-					}
-					dancersParenting();
-
-				default: //nothing
-			}
 		}
 	}
 
@@ -270,24 +189,5 @@ class Limo extends BaseStage
 			//resetFastCar();
 			carTimer = null;
 		});
-	}
-
-	function killHenchmen():Void
-	{
-		if(!ClientPrefs.data.lowQuality) {
-			if(limoKillingState == WAIT) {
-				limoMetalPole.x = -400;
-				limoMetalPole.visible = true;
-				limoLight.visible = true;
-				limoCorpse.visible = false;
-				limoCorpseTwo.visible = false;
-				limoKillingState = KILLING;
-
-				#if ACHIEVEMENTS_ALLOWED
-				var kills = Achievements.addScore("roadkill_enthusiast");
-				FlxG.log.add('Henchmen kills: $kills');
-				#end
-			}
-		}
 	}
 }

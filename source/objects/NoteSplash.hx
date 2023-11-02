@@ -59,7 +59,7 @@ class NoteSplash extends FlxSprite
 			config = precacheConfig(_configLoaded);
 
 		var tempShader:RGBPalette = null;
-		if((note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteRGB || ClientPrefs.data.disableSplashRGB))
+		if((note == null || note.noteSplashData.useRGBShader) && (PlayState.SONG == null || !PlayState.SONG.disableNoteRGB))
 		{
 			// If Note RGB is enabled:
 			if(note != null && !note.noteSplashData.useGlobalShader)
@@ -134,12 +134,12 @@ class NoteSplash extends FlxSprite
 		_configLoaded = skin;
 
 		if(animName == null)
-			animName = config != null ? config.anim : 'noteSplashes';
+			animName = config != null ? config.anim : 'note splash';
 
 		while(true) {
 			var animID:Int = maxAnims + 1;
 			for (i in 0...Note.colArray.length) {
-				if (!addAnimAndCheck('note$i-$animID', '$animName ${Note.colArray[i]} $animID', 24, false)) {
+				if (!addAnimAndCheck('note$i-$animID', '$animName ${Note.colArray[i]} $animID', ClientPrefs.data.SpritesFPS, false)) {
 					//trace('maxAnims: $maxAnims');
 					return config;
 				}
@@ -154,7 +154,7 @@ class NoteSplash extends FlxSprite
 		if(configs.exists(skin)) return configs.get(skin);
 
 		var path:String = Paths.getPath('images/$skin.txt', TEXT, true);
-		var configFile:Array<String> = CoolUtil.coolTextFile(path,false);
+		var configFile:Array<String> = CoolUtil.coolTextFile(path);
 		if(configFile.length < 1) return null;
 		
 		var framerates:Array<String> = configFile[1].split(' ');
@@ -177,7 +177,7 @@ class NoteSplash extends FlxSprite
 
 	function addAnimAndCheck(name:String, anim:String, ?framerate:Int = 24, ?loop:Bool = false)
 	{
-		animation.addByPrefix(name, anim, framerate, loop);
+		animation.addByPrefix(name, anim, ClientPrefs.data.SpritesFPS, loop);
 		return animation.getByName(name) != null;
 	}
 

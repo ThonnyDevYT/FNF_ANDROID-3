@@ -11,10 +11,10 @@ class CheckboxThingie extends FlxSprite
 		super(x, y);
 
 		frames = Paths.getSparrowAtlas('checkboxanim');
-		animation.addByPrefix("unchecked", "checkbox0", 24, false);
-		animation.addByPrefix("unchecking", "checkbox anim reverse", 24, false);
-		animation.addByPrefix("checking", "checkbox anim0", 24, false);
-		animation.addByPrefix("checked", "checkbox finish", 24, false);
+		animation.addByPrefix("unchecked", "checkbox0", ClientPrefs.data.SpritesFPS, false);
+		animation.addByPrefix("unchecking", "checkbox anim reverse", ClientPrefs.data.SpritesFPS, false);
+		animation.addByPrefix("checking", "checkbox anim0", ClientPrefs.data.SpritesFPS, false);
+		animation.addByPrefix("checked", "checkbox finish", ClientPrefs.data.SpritesFPS, false);
 
 		antialiasing = ClientPrefs.data.antialiasing;
 		setGraphicSize(Std.int(0.9 * width));

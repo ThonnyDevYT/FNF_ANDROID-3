@@ -2,8 +2,6 @@ package substates;
 
 import objects.AttachedText;
 import objects.CheckboxThingie;
-import flixel.addons.transition.FlxTransitionableState;
-
 
 class GameplayChangersSubstate extends MusicBeatSubstate
 {
@@ -20,7 +18,10 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', 'string', 'multiplicative', ["multiplicative", "constant"]);
 		optionsArray.push(goption);
 
-		var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollspeed', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Scroll Speed',
+		'scrollspeed',
+		'float',
+		1);
 		option.scrollSpeed = 2.0;
 		option.minValue = 0.35;
 		option.changeValue = 0.05;
@@ -38,7 +39,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 
 		#if !html5
-		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed2', 'float', 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
 		option.maxValue = 3.0;
@@ -48,7 +49,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		optionsArray.push(option);
 		#end
 
-		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain2', 'float', 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0;
 		option.maxValue = 5;
@@ -56,7 +57,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		option.displayFormat = '%vX';
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Health Loss Multiplier', 'healthloss', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Health Loss Multiplier', 'healthloss2', 'float', 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0.5;
 		option.maxValue = 5;
@@ -64,13 +65,13 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		option.displayFormat = '%vX';
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Instakill on Miss', 'instakill', 'bool', false);
+		var option:GameplayOption = new GameplayOption('Instakill on Miss', 'instakill2', 'bool', false);
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Practice Mode', 'practice', 'bool', false);
+		var option:GameplayOption = new GameplayOption('Practice Mode', 'practice2', 'bool', false);
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Botplay', 'botplay', 'bool', false);
+		var option:GameplayOption = new GameplayOption('Botplay', 'botplay2', 'bool', false);
 		optionsArray.push(option);
 	}
 
@@ -137,11 +138,6 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 
 		changeSelection();
 		reloadCheckboxes();
-		
-		#if android
-		addVirtualPad(FULL, A_B_C);
-		addPadCamera();
-		#end
 	}
 
 	var nextAccept:Int = 5;
@@ -159,15 +155,9 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 		}
 
 		if (controls.BACK) {
-			#if android
-			FlxTransitionableState.skipNextTransOut = true;
-			FlxG.resetState();
-			#else
-			FlxG.sound.play(Paths.sound('cancelMenu'));
 			close();
-			#end
 			ClientPrefs.saveSettings();
-			
+			FlxG.sound.play(Paths.sound('cancelMenu'));
 		}
 
 		if(nextAccept <= 0)
@@ -278,7 +268,7 @@ class GameplayChangersSubstate extends MusicBeatSubstate
 				}
 			}
 
-			if(controls.RESET #if android || MusicBeatSubstate._virtualpad.buttonC.justPressed #end)
+			if(controls.RESET)
 			{
 				for (i in 0...optionsArray.length)
 				{

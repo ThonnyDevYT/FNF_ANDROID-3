@@ -2,8 +2,8 @@ package options;
 
 import objects.CheckboxThingie;
 import objects.AttachedText;
-import flixel.addons.transition.FlxTransitionableState;
 import options.Option;
+import objects.Notification;
 
 class BaseOptionsMenu extends MusicBeatSubstate
 {
@@ -32,11 +32,20 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		DiscordClient.changePresence(rpcTitle, null);
 		#end
 		
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		/*var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.color = 0xFFea71fd;
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.data.antialiasing;
+		add(bg);*/
+		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		bg.color = 0x000000;
+		bg.screenCenter();
+		bg.antialiasing = ClientPrefs.data.antialiasing;
 		add(bg);
+
+		var bgApha:FlxSprite = new FlxSprite().makeGraphic(0, 0, 0xA0000000);
+		bgApha.screenCenter();
+		add(bgApha);
 
 		// avoids lagspikes while scrolling through menus!
 		grpOptions = new FlxTypedGroup<Alphabet>();
@@ -58,7 +67,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		add(titleText);
 
 		descText = new FlxText(50, 600, 1180, "", 32);
-		descText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		descText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.BLACK, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.WHITE);
 		descText.scrollFactor.set();
 		descText.borderSize = 2.4;
 		add(descText);
@@ -91,10 +100,6 @@ class BaseOptionsMenu extends MusicBeatSubstate
 			//optionText.snapToPosition(); //Don't ignore me when i ask for not making a fucking pull request to uncomment this line ok
 			updateTextFrom(optionsArray[i]);
 		}
-		
-		        #if android
-                addVirtualPad(FULL, A_B_C);
-                #end
 
 		changeSelection();
 		reloadCheckboxes();
@@ -120,17 +125,22 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		}
 
 		if (controls.BACK) {
-			#if android
-			FlxTransitionableState.skipNextTransOut = true;
-			FlxG.resetState();
-			ClientPrefs.saveSettings();
-			#else
 			close();
-			#end
+			FlxG.sound.play(Paths.sound('cancelMenu'));
 			ClientPrefs.saveSettings();
-			
-			//FlxG.sound.play(Paths.sound('cancelMenu'));
+			//ClientPrefs.loadPrefs();
+			//ClientPrefs.loadPrefs();
+			//add(new Notification(null, "Ajustes!", "Los Ajustes Se Guardaron Exitosamente!!", 0));
+			//ClientPrefs.loadPrefs();
 		}
+
+		#if DEMO_MODE
+		if (FlxG.keys.justPressed.B) {
+			close();
+			FlxG.sound.play(Paths.sound('confirmMenu'));
+			ClientPrefs.loadPrefs();
+		}
+		#end
 
 		if(nextAccept <= 0)
 		{
@@ -218,27 +228,23 @@ class BaseOptionsMenu extends MusicBeatSubstate
 					}
 				} else if(controls.UI_LEFT_R || controls.UI_RIGHT_R) {
 					clearHold();
+					ClientPrefs.saveSettings();
 				}
 			}
 
-			if(controls.RESET #if android || MusicBeatSubstate._virtualpad.buttonC.justPressed #end)
+			if(controls.RESET)
 			{
-				for (i in 0...optionsArray.length)
+				var leOption:Option = optionsArray[curSelected];
+				leOption.setValue(leOption.defaultValue);
+				if(leOption.type != 'bool')
 				{
-					var leOption:Option = optionsArray[i];
-					leOption.setValue(leOption.defaultValue);
-					if(leOption.type != 'bool')
-					{
-						if(leOption.type == 'string')
-						{
-							leOption.curOption = leOption.options.indexOf(leOption.getValue());
-						}
-						updateTextFrom(leOption);
-					}
-					leOption.change();
+					if(leOption.type == 'string') leOption.curOption = leOption.options.indexOf(leOption.getValue());
+					updateTextFrom(leOption);
 				}
+				leOption.change();
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				reloadCheckboxes();
+				ClientPrefs.saveSettings();
 			}
 		}
 
@@ -254,6 +260,7 @@ class BaseOptionsMenu extends MusicBeatSubstate
 		if(option.type == 'percent') val *= 100;
 		var def:Dynamic = option.defaultValue;
 		option.text = text.replace('%v', val).replace('%d', def);
+		ClientPrefs.saveSettings();
 	}
 
 	function clearHold()

@@ -96,7 +96,7 @@ class LuaUtils
 			}
 			return target;
 		}
-
+		
 		if(allowMaps && isMap(instance))
 		{
 			//trace(instance);
@@ -111,7 +111,7 @@ class LuaUtils
 		}
 		return Reflect.getProperty(instance, variable);
 	}
-
+	
 	public static function isMap(variable:Dynamic)
 	{
 		/*switch(Type.typeof(variable)){
@@ -165,7 +165,7 @@ class LuaUtils
 		return obj;
 	}
 
-	public static function getObjectDirectly(objectName:String, ?checkForTextsToo:Bool = true, allowMaps:Bool = false):Dynamic
+	public static function getObjectDirectly(objectName:String, ?checkForTextsToo:Bool = true, ?allowMaps:Bool = false):Dynamic
 	{
 		switch(objectName)
 		{
@@ -180,7 +180,9 @@ class LuaUtils
 	}
 
 	inline public static function getTextObject(name:String):FlxText
+	{
 		return #if LUA_ALLOWED PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : #end Reflect.getProperty(PlayState.instance, name);
+	}
 	
 	public static function isOfTypes(value:Any, types:Array<Dynamic>)
 	{
@@ -192,7 +194,9 @@ class LuaUtils
 	}
 	
 	public static inline function getTargetInstance()
+	{
 		return PlayState.instance.isDead ? GameOverSubstate.instance : PlayState.instance;
+	}
 
 	public static inline function getLowestCharacterGroup():FlxSpriteGroup
 	{
@@ -205,7 +209,7 @@ class LuaUtils
 			group = PlayState.instance.boyfriendGroup;
 			pos = newPos;
 		}
-
+		
 		newPos = PlayState.instance.members.indexOf(PlayState.instance.dadGroup);
 		if(newPos < pos)
 		{
@@ -214,7 +218,7 @@ class LuaUtils
 		}
 		return group;
 	}
-
+	
 	public static function addAnimByIndices(obj:String, name:String, prefix:String, indices:Any = null, framerate:Int = 24, loop:Bool = false)
 	{
 		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
@@ -241,7 +245,7 @@ class LuaUtils
 		}
 		return false;
 	}
-
+	
 	public static function loadFrames(spr:FlxSprite, image:String, spriteType:String)
 	{
 		switch(spriteType.toLowerCase().trim())
@@ -255,9 +259,6 @@ class LuaUtils
 			case "packer" | "packeratlas" | "pac":
 				spr.frames = Paths.getPackerAtlas(image);
 
-			case "i8" | "jsoni8" | "json": 
-				spr.frames = Paths.getJsonAtlas(image);
-
 			default:
 				spr.frames = Paths.getSparrowAtlas(image);
 		}
@@ -265,8 +266,9 @@ class LuaUtils
 
 	public static function resetTextTag(tag:String) {
 		#if LUA_ALLOWED
-		if(!PlayState.instance.modchartTexts.exists(tag))
+		if(!PlayState.instance.modchartTexts.exists(tag)) {
 			return;
+		}
 
 		var target:FlxText = PlayState.instance.modchartTexts.get(tag);
 		target.kill();
@@ -278,8 +280,9 @@ class LuaUtils
 
 	public static function resetSpriteTag(tag:String) {
 		#if LUA_ALLOWED
-		if(!PlayState.instance.modchartSprites.exists(tag))
+		if(!PlayState.instance.modchartSprites.exists(tag)) {
 			return;
+		}
 
 		var target:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
 		target.kill();
@@ -410,7 +413,6 @@ class LuaUtils
 		switch(cam.toLowerCase()) {
 			case 'camhud' | 'hud': return PlayState.instance.camHUD;
 			case 'camother' | 'other': return PlayState.instance.camOther;
-			//case 'cambars' | 'bars': return PlayState.instance.camBars;
 		}
 		return PlayState.instance.camGame;
 	}

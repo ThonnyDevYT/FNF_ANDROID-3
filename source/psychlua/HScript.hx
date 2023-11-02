@@ -30,7 +30,7 @@ class HScript extends SScript
 		}
 		else
 		{
-			hs.doScript(code);
+			hs.doString(code);
 			@:privateAccess
 			if(hs.parsingException != null)
 			{
@@ -152,7 +152,7 @@ class HScript extends SScript
 		set('this', this);
 		set('game', PlayState.instance);
 		if (PlayState.instance != null)
-			setSpecialObject(PlayState.instance, false, PlayState.instance.instancesExclude);
+			setSpecialObject(PlayState.instance, false);
 		set('buildTarget', FunkinLua.getBuildTarget());
 		set('customSubstate', CustomSubstate.instance);
 		set('customSubstateName', CustomSubstate.name);
@@ -293,12 +293,12 @@ class HScript extends SScript
 		#end
 	}
 
-	override public function kill()
+	override public function destroy()
 	{
 		origin = null;
 		parentLua = null;
 
-		super.kill();
+		super.destroy();
 	}
 }
 

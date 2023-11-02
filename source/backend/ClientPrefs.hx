@@ -17,8 +17,6 @@ class SaveVariables {
 	public var antialiasing:Bool = true;
 	public var noteSkin:String = 'Default';
 	public var splashSkin:String = 'Psych';
-	public var disableNoteRGB:Bool = false;
-	public var disableSplashRGB:Bool = false;
 	public var splashAlpha:Float = 0.6;
 	public var lowQuality:Bool = false;
 	public var shaders:Bool = true;
@@ -26,6 +24,35 @@ class SaveVariables {
 	public var framerate:Int = 60;
 	public var camZooms:Bool = true;
 	public var hideHud:Bool = false;
+	public var alphahud:Bool = true;
+	public var fullyscreen:Bool = false;
+	//Thonny Code
+
+	/*
+	[public var 'Funcion':'tipo' = 'true o false' else '0 - 80' else 'texto a eleccion';]
+	*/
+	public var Welcome:Bool = false;
+	public var InitialSettings:Bool = false;
+	public var language:String = 'Inglish';
+	public var graphics_internal:String = 'Medium';
+	public var fullscreen:Bool = false;
+	public var opacity_mouse:Float = 1;
+	public var Update_Support:Bool = false;
+	public var spritesFPS:String = 'Sprites: 24';
+	public var SpritesFPS:Int = 24;
+	public var Internet:String = 'disabled';
+	public var InternetStatus:String = 'Disconnect';
+	public var demo:Bool = true;
+	public var recordoptimization:String = 'Disabled';
+	public var notivisible:Bool = true;
+	public var timetrans:Int = 1;
+	public var musicstate:String = 'MenuTetrik-State Horror';
+
+	//Cuidado con esta opcion cambia el juego sin ningun tipo de problema de rendimiento!!
+	public var ultraMode:Bool = false;
+	//Esta funcion da permiso a que puedas modificar cambiar usar animaciones sin tener en cuenta el rendimiento !!Solo para Pcs Modernas!!
+
+	//Thonny Code "End"
 	public var noteOffset:Int = 0;
 	public var arrowRGB:Array<Array<FlxColor>> = [
 		[0xFFC24B99, 0xFFFFFFFF, 0xFF3C1F56],
@@ -76,18 +103,7 @@ class SaveVariables {
 	public var badWindow:Int = 135;
 	public var safeFrames:Float = 10;
 	public var discordRPC:Bool = true;
-	
-	
-	//hitbox and android controls
-	public var spaceExtend:Bool = true;
-	public var shiftExtend:Bool = true;
-	public var hitboxLocation:String = 'Bottom';
-	public var hitboxalpha:Float = 0.2;
-	public var VirtualPadAlpha:Float = 0.75;
-    
-    
-    
-    
+
 	public function new()
 	{
 		//Why does haxe needs this again?
@@ -179,8 +195,8 @@ class ClientPrefs {
 			//trace('saved variable: $key');
 			Reflect.setField(FlxG.save.data, key, Reflect.field(data, key));
 		}
-		FlxG.save.data.achievementsMap = Achievements.achievementsMap;
-		FlxG.save.data.henchmenDeath = Achievements.henchmenDeath;
+//		FlxG.save.data.achievementsMap = Achievements.achievementsMap;
+	//	FlxG.save.data.henchmenDeath = Achievements.henchmenDeath;
 		FlxG.save.flush();
 
 		//Placing this in a separate save so that it can be manually deleted without removing your Score and stuff
